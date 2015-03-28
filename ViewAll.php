@@ -23,11 +23,15 @@
           $(this).addClass('active');
         }
       });
+
       $('#submit').click(function(event) {
-        alert("Received event");
+        
         var address = $('#location').val();
+        alert("Searching for " + address);
         geocoder.geocode( { 'address': address}, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
+            
+            
             map.setCenter(results[0].geometry.location);
             var marker = new google.maps.Marker({
                 map: map,
@@ -35,6 +39,17 @@
             });
           } else {
             alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+
+        //Now I have startlat/lang
+        var dataString = 'lat='+name+'&last_name='+last_name;
+        $.ajax({
+          type:'POST',
+          data:dataString,
+          url:'insert.php',
+          success:function(data) {
+            alert(data);
           }
         });
       });
