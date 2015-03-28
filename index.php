@@ -24,6 +24,9 @@
       });
     });
 
+      /**
+      Home page will always show the Delhi(Hackathon's) location. 
+      **/
     function initialize() {
       var mapProp = {
         center:new google.maps.LatLng(28.6139391,77.20902120000005  ),
@@ -83,7 +86,6 @@
         </form>
       </div>
     </div>
-
   <div>
 </div>
 </body>

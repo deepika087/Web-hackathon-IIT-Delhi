@@ -7,7 +7,9 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
+// Query to get all the locations from the database
 $sql = "select * from user_locations ";
+
 $result = $mysqli->query($sql);
 class LatLangObject {
 	public $userId = "";

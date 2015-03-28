@@ -7,10 +7,14 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
+startlat = $_POST['startlat'];
+startlng = $_POST['startlng'];
+radius = $_POST['radius'];
+
 $sql = "SELECT latitude, longitude, SQRT(
-    POW(69.1 * (latitude - [startlat]), 2) +
-    POW(69.1 * ([startlng] - longitude) * COS(latitude / 57.3), 2)) AS distance
-FROM TableName HAVING distance < 25 ORDER BY distance ";
+    POW(69.1 * (latitude - [" + $startlat + "]), 2) +
+    POW(69.1 * ([" + startlng + "] - longitude) * COS(latitude / 57.3), 2)) AS distance
+FROM TableName HAVING distance < " + $radius + "ORDER BY distance ";
 
 $result = $mysqli->query($sql);
 class LatLangObject {
@@ -29,5 +33,5 @@ while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
 }
 
 $someJSON = json_encode($resultList);
- echo $someJSON;
+echo $someJSON;
 ?>

@@ -6,6 +6,10 @@
   
   <script type="text/javascript">
     $(document).ready(function() {
+
+      /**
+      This area is just to handle the navigation bar
+      **/
        $('.nav.nav-pills.nav-stacked li a').first(function(e) {
         console.log('capttured event in the ready stage itself');
         if (!$(this).hasClass('active'))
@@ -24,37 +28,55 @@
         }
       });
 
+      /**
+      Called when user enters the area to search and the radius.
+      Step 1: To get the Lat lang for the input location
+      Step 2: Now that we have lat lang and the radius then Database is sent a post request to get all the locations with radius mentioned.
+      **/
       $('#submit').click(function(event) {
         
         var address = $('#location').val();
         alert("Searching for " + address);
+        geocoder = new google.maps.Geocoder();
         geocoder.geocode( { 'address': address}, function(results, status) {
+          var lat = 0;
+          var lang = 0;
           if (status == google.maps.GeocoderStatus.OK) {
-            
-            
-            map.setCenter(results[0].geometry.location);
-            var marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location
+            lat = results[0].geometry.location.lat();
+            lang = results[0].geometry.location.lng();
+
+            //NOW SEARCH THE NEARBY PLACES
+            var dataString = 'startlat='+lat+'&startlng='+lang+'&radius='+$('#radius').val();
+            /**
+              Send request to file to get all the near by locations given the latitude and langitude. 
+            **/
+            $.ajax({
+              type:'POST',
+              data:dataString,
+              url:'GetNearByLocatiions.php',
+              success:function(data) {
+                /**
+                Data will contain list of all user ID within the region
+                **/
+                //alert(data); //DATA IS THE LIST OF REQUIRED USER IDS
+                for (i = 0, len = data.length; i < len; i++) {
+                  e=data[i];
+                  console.log("users nearby Places" + e.userId);
+                }
+              }
             });
           } else {
             alert('Geocode was not successful for the following reason: ' + status);
           }
         });
-
-        //Now I have startlat/lang
-        var dataString = 'lat='+name+'&last_name='+last_name;
-        $.ajax({
-          type:'POST',
-          data:dataString,
-          url:'insert.php',
-          success:function(data) {
-            alert(data);
-          }
-        });
       });
     });
 
+    /**
+    Called when the page is loaded so such that a get call is made to database to get all the locations and they are plotted on the Map.
+    Hence the map refereshes after becuase call is made to database to get the new locations.
+    Working fine tested. 
+    **/
     function initialize() {
       var request = $.ajax({
             url: "./GetAllLocationsFromDatabase.php",
@@ -71,7 +93,7 @@
               };
             var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
 
-            console.log("reached here");
+            // PROCESS THE JSON recieved.
             for (i = 0, len = json.length; i < len; i++) {
               e=json[i];
               console.log(e.userId + " --" + e.lat);
@@ -90,7 +112,6 @@
             alert( "Request failed: " + textStatus );
           });
     }
-    
     
     google.maps.event.addDomListener(window, 'load', initialize);
   </script>
@@ -129,7 +150,10 @@
                 <tr></tr>
               </table>
           <center><input id="submit" name="submit" type="submit" value="Send" class="btn btn-primary"></center> 
-        
+      </div>
+
+      <div class="row" > 
+        List of Users Will go here
       </div>
     </div>
 
